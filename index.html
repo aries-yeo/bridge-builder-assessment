@@ -941,16 +941,15 @@
             
             const data = {
                 api_key: apiKey,
-                email_address: email, 
+                email_address: email, }
                 fields: {
                     Score: score,
                     Category: category,
                     AssessmentDate: new Date().toISOString().split('T')[0]
                 },
-                tags: {"Bridge Builder Assessment": true,
-            }
-                status: {"subscribed"
-                        }});
+                tags: {"Bridge Builder Assessment": true,}
+                status: "subscribed"
+                        });
 
             fetch(`https://emailoctopus.com/api/1.6/lists/${listId}/contacts`, {
                 method: 'POST',
