@@ -1,0 +1,966 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bridge Builder Readiness Assessment</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Georgia, 'Times New Roman', serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #64bcae 0%, #307066 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #307066, #64bcae);
+            color: white;
+            padding: 40px 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-family: Georgia, 'Times New Roman', serif;
+            font-size: 2.8rem;
+            margin-bottom: 15px;
+            font-weight: 700;
+        }
+
+        .header .subtitle {
+            font-family: Georgia, 'Times New Roman', serif;
+            font-size: 1.3rem;
+            margin-bottom: 15px;
+            opacity: 0.95;
+            font-weight: 500;
+        }
+
+        .header .positioning {
+            font-family: Georgia, 'Times New Roman', serif;
+            font-size: 1rem;
+            opacity: 0.85;
+            font-style: italic;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .quiz-container {
+            padding: 40px 30px;
+        }
+
+        .section {
+            margin-bottom: 40px;
+            padding: 30px;
+            background: #f8f9fa;
+            border-radius: 15px;
+            border-left: 6px solid #64bcae;
+        }
+
+        .section h2 {
+            font-family: Georgia, 'Times New Roman', serif;
+            color: #307066;
+            font-size: 1.8rem;
+            margin-bottom: 25px;
+            text-align: center;
+        }
+
+        .section-points {
+            font-family: Georgia, 'Times New Roman', serif;
+            text-align: center;
+            color: #666;
+            margin-bottom: 20px;
+            font-style: italic;
+        }
+
+        .question {
+            margin-bottom: 35px;
+            padding: 25px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+        }
+
+        .question h3 {
+            font-family: Georgia, 'Times New Roman', serif;
+            color: #307066;
+            margin-bottom: 20px;
+            font-size: 1.2rem;
+            line-height: 1.5;
+        }
+
+        .options {
+            display: grid;
+            gap: 12px;
+        }
+
+        .option {
+            display: flex;
+            align-items: flex-start;
+            padding: 15px 18px;
+            background: #fafafa;
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .option:hover {
+            border-color: #64bcae;
+            background: #f0f9f7;
+            transform: translateX(3px);
+        }
+
+        .option.selected {
+            border-color: #64bcae;
+            background: #e8f5f3;
+        }
+
+        .option input[type="radio"] {
+            margin-right: 15px;
+            margin-top: 2px;
+            transform: scale(1.3);
+            accent-color: #64bcae;
+            flex-shrink: 0;
+        }
+
+        .option label {
+            font-family: Georgia, 'Times New Roman', serif;
+            cursor: pointer;
+            font-weight: 500;
+            line-height: 1.4;
+        }
+
+        .email-section {
+            background: #f8f9fa;
+            padding: 30px;
+            border-radius: 15px;
+            margin-top: 30px;
+            border-left: 6px solid #64bcae;
+        }
+
+        .email-section h3 {
+            font-family: Georgia, 'Times New Roman', serif;
+            color: #307066;
+            margin-bottom: 20px;
+            text-align: center;
+            font-size: 1.5rem;
+        }
+
+        .email-section p {
+            font-family: Georgia, 'Times New Roman', serif;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            font-family: Georgia, 'Times New Roman', serif;
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #307066;
+        }
+
+        .form-group input[type="email"] {
+            font-family: Georgia, 'Times New Roman', serif;
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-group input[type="email"]:focus {
+            outline: none;
+            border-color: #64bcae;
+        }
+
+        .checkbox-group {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            margin-bottom: 25px;
+        }
+
+        .checkbox-group input[type="checkbox"] {
+            margin-top: 3px;
+            transform: scale(1.2);
+            accent-color: #64bcae;
+            flex-shrink: 0;
+        }
+
+        .checkbox-group label {
+            font-family: Georgia, 'Times New Roman', serif;
+            line-height: 1.5;
+            cursor: pointer;
+        }
+
+        .submit-btn {
+            font-family: Georgia, 'Times New Roman', serif;
+            background: linear-gradient(135deg, #64bcae, #307066);
+            color: white;
+            padding: 18px 50px;
+            border: none;
+            border-radius: 50px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: block;
+            margin: 30px auto;
+            box-shadow: 0 10px 25px rgba(100, 188, 174, 0.3);
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 35px rgba(100, 188, 174, 0.4);
+        }
+
+        .submit-btn:disabled {
+            background: #bdc3c7;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .results {
+            display: none;
+            padding: 40px 30px;
+            text-align: center;
+            background: #f8f9fa;
+            border-radius: 15px;
+            margin-top: 30px;
+        }
+
+        .results.show {
+            display: block;
+            animation: fadeIn 0.6s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .score-display {
+            font-family: Georgia, 'Times New Roman', serif;
+            font-size: 4rem;
+            font-weight: bold;
+            color: #64bcae;
+            margin-bottom: 25px;
+        }
+
+        .category {
+            font-family: Georgia, 'Times New Roman', serif;
+            padding: 25px;
+            border-radius: 15px;
+            margin: 25px 0;
+            font-size: 1.4rem;
+            font-weight: bold;
+        }
+
+        .category.bridge-ready {
+            background: linear-gradient(135deg, #64bcae, #307066);
+            color: white;
+        }
+
+        .category.foundation-strong {
+            background: linear-gradient(135deg, #7cc9bb, #4a9b8e);
+            color: white;
+        }
+
+        .category.pathway-emerging {
+            background: linear-gradient(135deg, #94d6c8, #6bb3a1);
+            color: #2d5a52;
+        }
+
+        .category.signal-detected {
+            background: linear-gradient(135deg, #a8e0d5, #85c7b8);
+            color: #2d5a52;
+        }
+
+        .category.awareness-building {
+            background: linear-gradient(135deg, #bce9e1, #a1d9ce);
+            color: #2d5a52;
+        }
+
+        .description {
+            font-family: Georgia, 'Times New Roman', serif;
+            font-size: 1.1rem;
+            line-height: 1.6;
+            color: #307066;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #e9ecef;
+            border-radius: 4px;
+            margin-bottom: 25px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #64bcae, #307066);
+            width: 0%;
+            transition: width 0.4s ease;
+        }
+
+        .thank-you {
+            font-family: Georgia, 'Times New Roman', serif;
+            background: #e8f5f3;
+            border: 1px solid #64bcae;
+            color: #307066;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 20px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Bridge Builder Readiness Assessment</h1>
+            <p class="subtitle">Strategic Readiness Diagnostic for Significance-Driven Leaders</p>
+            <p class="positioning">"This assessment measures your actual readiness for meaningful transition, not just your desire for it. Accurate self-assessment is the foundation of strategic decision-making."</p>
+        </div>
+
+        <div class="progress-bar">
+            <div class="progress-fill" id="progressFill"></div>
+        </div>
+
+        <div class="quiz-container">
+            <form id="assessmentForm">
+                <!-- Section 1: Vision Clarity -->
+                <div class="section">
+                    <h2>Section 1: Vision Clarity</h2>
+                    <p class="section-points">(20 points possible)</p>
+
+                    <div class="question">
+                        <h3>Question 1: When you imagine work that creates meaningful societal contribution:</h3>
+                        <div class="options">
+                            <div class="option">
+                                <input type="radio" id="q1a" name="q1" value="5">
+                                <label for="q1a">I have a crystal-clear vision of what I want to create</label>
+                            </div>
+                            <div class="option">
+                                <input type="radio" id="q1b" name="q1" value="4">
+                                <label for="q1b">I have a general direction but need to refine the specifics</label>
+                            </div>
+                            <div class="option">
+                                <input type="radio" id="q1c" name="q1" value="3">
+                                <label for="q1c">I know I want impact but unsure what form it should take</label>
+                            </div>
+                            <div class="option">
+                                <input type="radio" id="q1d" name="q1" value="2">
+                                <label for="q1d">I'm hoping the right opportunity will present itself</label>
+                            </div>
+                            <div class="option">
+                                <input type="radio" id="q1e" name="q1" value="1">
+                                <label for="q1e">I'm not sure what meaningful work looks like for me yet</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="question">
+                        <h3>Question 2: Regarding your unique contribution to solving significant problems:</h3>
+                        <div class="options">
+                            <div class="option">
+                                <input type="radio" id="q2a" name="q2" value="5">
+                                <label for="q2a">I can articulate exactly how my expertise addresses a specific systemic challenge</label>
+                            </div>
+                            <div class="option">
+                                <input type="radio" id="q2b" name="q2" value="4">
+                                <label for="q2b">I see connections between my skills and important problems but need to develop the strategy</label>
+                            </div>
+                            <div class="option">
+                                <input type="radio" id="q2c" name="q2" value="3">
+                                <label for="q2c">I believe my background is valuable but haven't identified the specific application</label>
+                            </div>
+                            <div class="option">
+                                <input type="radio" id="q2d" name="q2" value="2">
+                                <label for="q2d">I hope my experience is relevant to meaningful work</label>
+                            </div>
+                            <div class="option">
+                                <input type="radio" id="q2e" name="q2" value="1">
+                                <label for="q2e">I'm unsure how my corporate background translates to societal impact</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="question">
+                        <h3>Question 3: My definition of success has evolved to prioritize:</h3>
+                        <div class="options">
+                            <div class="option">
+                                <input type="radio" id="q3a" name="q3" value="5">
+                                <label for="q3a">Impact and legacy over personal achievement</label>
+                            </div>
+                            <div class="option">
+                                <input type="radio" id="q3b" name="q3" value="4">
+                                <label for="q3b">Meaningful work alongside financial success</label>
+                            </div>
+                            <div class="option">
+                                <input type="radio" id="q3c" name="q3" value="3">
+                                <label for="q3c">A better balance between achievement and contribution</label>
+                            </div>
+                            <div class="option">
+                                <input type="radio" id="q3d" name="q3" value="2">
+                                <label for="q3d">Some element of purpose within my current framework</label>
+                            </div>
+                            <div class="option">
+                                <input type="radio" id="q3e" name="q3" value="1">
+                                <label for="q3e">I'm still figuring out what success means to me now</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="question">
+                        <h3>Question 4: When I think about my most important work:</h3>
+                        <div class="options">
+                            <div class="option">
+                                <input type="radio" id="q4a" name="q4" value="5">
+                                <label for="q4a">I'm confident it lies ahead and I'm ready to pursue it</label>
+                            </div>
+                            <div class="option">
+                                <input type="radio" id="q4b" name="q4" value="4">
+                                <label for="q4b">I believe it's ahead but want to plan carefully</label>
+                            </div>
+                            <div class="option">
+                                <input type="radio" id="q4c" name="q4" value="3">
+                                <label for="q4c">I hope it's ahead but worry about practical challenges</label>
+                            </div>
+                            <div class="option">
+                                <input type="radio" id="q4d" name="q4" value="2">
+                                <label for="q4d">I think it might be ahead but I'm comfortable where I am</label>
+                            </div>
+                            <div class="option">
+                                <input type="radio" id="q4e" name="q4" value="1">
+                                <label for="q4e">I'm unsure if my best work is ahead or behind me</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Section 2: Commitment Reality -->
+                <div class="section">
+                    <h2>Section 2: Commitment Reality</h2>
+                    <p class="section-points">(30 points possible)</p>
+
+                    <div class="question">
+                        <h3>Question 5: In the next 12 months, I am most likely to:</h3>
+                        <div class="options">
+                            <div class="option">
+                                <input type="radio" id="q5a" name="q5" value="5">
+                                <label for="q5a">Take concrete steps toward a significant professional transition</label>
+                            </div>
+                            <div class="option">
+                                <input type="radio" id="q5b" name="q5" value="4">
+                                <label for="q5b">Seriously investigate career pivots aligned with purpose</label>
+                            </div>
+                            <div class="option">
+                                <input type="radio" id="q5c" name="q5" value="3">
+                                <label for="q5c">Explore new opportunities within my current company</label>
+                            </div>
+                            <div class="option">
+                                <input type="radio" id="q5d" name="q5" value="2">
+                                <label for="q5d">Stay in my current role while exploring options</label>
+                            </div>
+                            <div class="option">
+                                <input type="radio" id="q5e" name="q5" value="1">
+                                <label for="q5e">Focus on optimizing my current position</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="question">
+                        <h3>Question 6: To pursue more meaningful work, I would realistically be willing to: (Select your honest maximum)</h3>
+                        <div class="options">
+                            <div class="option">
+                                <input type="radio" id="q6a" name="q6" value="5">
+                                <label for="q6a">Accept 30%+ income reduction and 2+ years to rebuild</label>
+                            </div>
+                            <div class="option">
+                                <input type="radio" id="q6b" name="q6" value="4">
+                                <label for="q6b">Accept 20-30% income reduction and 1-2 years transition</label>
+                            </div>
+                            <div class="option">
+                                <input type="radio" id="q6c" name="q6" value="3">
+                                <label for="q6c">Accept 10-20% income reduction initially</label>
+                            </div>
+                            <div class="option">
+                                <input type="radio" id="q6d" name="q6" value="2">
+                                <label for="q6d">Maintain similar income while changing work focus</label>
+                            </div>
+                            <div class="option">
+                                <input type="radio" id="q6e" name="q6" value="1">
+                                <label for="q6e">Only pursue options that increase my current income</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="question">
+                        <h3>Question 7: Regarding my professional identity:</h3>
+                        <div class="options">
+                            <div class="option">
+                                <input type="radio" id="q7a" name="q7" value="5">
+                                <label for="q7a">I'm ready to completely reimagine how I define myself professionally</label>
+                            </div>
+                            <div class="option">
+                                <input type="radio" id="q7b" name="q7" value="4">
+                                <label for="q7b">I'm willing to expand my identity to include new dimensions</label>
+                            </div>
+                            <div class="option">
+                                <input type="radio" id="q7c" name="q7" value="3">
+                                <label for="q7c">I want to evolve my identity while keeping core elements</label>
+                            </div>
+                            <div class="option">
+                                <input type="radio" id="q7d" name="q7" value="2">
+                                <label for="q7d">I prefer to enhance my current identity rather than change it</label>
+                            </div>
+                            <div class="option">
+                                <input type="radio" id="q7e" name="q7" value="1">
+                                <label for="q7e">My current professional identity is integral to who I am</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="question">
+                        <h3>Question 8: When I consider the time investment for meaningful transition:</h3>
+                        <div class="options">
+                            <div class="option">
+                                <input type="radio" id="q8a" name="q8" value="5">
+                                <label for="q8a">I'm prepared to dedicate 12+ months to exploration and transition</label>
+                            </div>
+                            <div class="option">
+                                <input type="radio" id="q8b" name="q8" value="4">
+                                <label for="q8b">I can commit 6-12 months to making this change</label>
+                            </div>
+                            <div class="option">
+                                <input type="radio" id="q8c" name="q8" value="3">
+                                <label for="q8c">I have 3-6 months to dedicate to this process</label>
+                            </div>
+                            <div class="option">
+                                <input type="radio" id="q8d" name="q8" value="2">
+                                <label for="q8d">I can spare a few hours per week to explore options</label>
+                            </div>
+                            <div class="option">
+                                <input type="radio" id="q8e" name="q8" value="1">
+                                <label for="q8e">I need to fit this exploration around my current demanding schedule</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="question">
+                        <h3>Question 9: When considering investment in professional transformation coaching:</h3>
+                        <div class="options">
+                            <div class="option">
+                                <input type="radio" id="q9a" name="q9" value="5">
+                                <label for="q9a">I view this as essential strategic investment, similar to executive education</label>
+                            </div>
+                            <div class="option">
+                                <input type="radio" id="q9b" name="q9" value="4">
+                                <label for="q9b">I'm prepared to make meaningful financial commitment for the right program</label>
+                            </div>
+                            <div class="option">
+                                <input type="radio" id="q9c" name="q9" value="3">
+                                <label for="q9c">I want to understand value before considering investment levels</label>
+                            </div>
+                            <div class="option">
+                                <input type="radio" id="q9d" name="q9" value="2">
+                                <label for="q9d">I prefer to start small and scale investment based on results</label>
+                            </div>
+                            <div class="option">
+                                <input type="radio" id="q9e" name="q9" value="1">
+                                <label for="q9e">I need to research and justify any significant professional development costs</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="question">
+                        <h3>Question 10: The biggest factor that might prevent me from taking action is:</h3>
+                        <div class="options">
+                            <div class="option">
+                                <input type="radio" id="q10a" name="q10" value="5">
+                                <label for="q10a">Nothing significant - I'm ready to move forward strategically</label>
+                            </div>
+                            <div class="option">
+                                <input type="radio" id="q10b" name="q10" value="4">
+                                <label for="q10b">Need for better planning and strategy</label>
+                            </div>
+                            <div class="option">
+                                <input type="radio" id="q10c" name="q10" value="3">
+                                <label for="q10c">Family concerns about change and uncertainty</label>
+                            </div>
+                            <div class="option">
+                                <input type="radio" id="q10d" name="q10" value="2">
+                                <label for="q10d">Financial obligations and lifestyle requirements</label>
+                            </div>
+                            <div class="option">
+                                <input type="radio" id="q10e" name="q10" value="1">
+                                <label for="q10e">Fear of leaving security for uncertain outcomes</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Section 3: Strategic Realism -->
+                <div class="section">
+                    <h2>Section 3: Strategic Realism</h2>
+                    <p class="section-points">(25 points possible)</p>
+
+                    <div class="question">
+                        <h3>Question 11: My current restlessness about my professional trajectory:</h3>
+                        <div class="options">
+                            <div class="option">
+                                <input type="radio" id="q11a" name="q11" value="5">
+                                <label for="q11a">Is a daily reality that motivates me to plan my transition</label>
+                            </div>
+                            <div class="option">
+                                <input type="radio" id="q11b" name="q11" value="4">
+                                <label for="q11b">Comes in waves but is becoming more frequent</label>
+                            </div>
+                            <div class="option">
+                                <input type="radio" id="q11c" name="q11" value="3">
+                                <label for="q11c">Surfaces periodically, especially during quiet moments</label>
+                            </div>
+                            <div class="option">
+                                <input type="radio" id="q11d" name="q11" value="2">
+                                <label for="q11d">Is something I notice but can usually suppress</label>
+                            </div>
+                            <div class="option">
+                                <input type="radio" id="q11e" name="q11" value="1">
+                                <label for="q11e">Is more of a vague feeling than a driving force</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="question">
+                        <h3>Question 12: Regarding calculated risks for authentic work:</h3>
+                        <div class="options">
+                            <div class="option">
+                                <input type="radio" id="q12a" name="q12" value="5">
+                                <label for="q12a">I've already taken significant professional risks and learned from them</label>
+                            </div>
+                            <div class="option">
+                                <input type="radio" id="q12b" name="q12" value="4">
+                                <label for="q12b">I've taken moderate risks and am ready for bigger ones</label>
+                            </div>
+                            <div class="option">
+                                <input type="radio" id="q12c" name="q12" value="3">
+                                <label for="q12c">I prefer calculated risks with clear upside potential</label>
+                            </div>
+                            <div class="option">
+                                <input type="radio" id="q12d" name="q12" value="2">
+                                <label for="q12d">I take risks only when the downside is minimal</label>
+                            </div>
+                            <div class="option">
+                                <input type="radio" id="q12e" name="q12" value="1">
+                                <label for="q12e">I generally prefer to avoid professional risks</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="question">
+                        <h3>Question 13: My support system for a significant career transition:</h3>
+                        <div class="options">
+                            <div class="option">
+                                <input type="radio" id="q13a" name="q13" value="5">
+                                <label for="q13a">Family/friends actively encourage me to pursue meaningful work</label>
+                            </div>
+                            <div class="option">
+                                <input type="radio" id="q13b" name="q13" value="4">
+                                <label for="q13b">Key people in my life would support a well-planned transition</label>
+                            </div>
+                            <div class="option">
+                                <input type="radio" id="q13c" name="q13" value="3">
+                                <label for="q13c">Most people would be supportive after initial concern</label>
+                            </div>
+                            <div class="option">
+                                <input type="radio" id="q13d" name="q13" value="2">
+                                <label for="q13d">There would be mixed reactions and some resistance</label>
+                            </div>
+                            <div class="option">
+                                <input type="radio" id="q13e" name="q13" value="1">
+                                <label for="q13e">Important people in my life prefer I maintain current success</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="question">
+                        <h3>Question 14: When I imagine myself in 3 years if I DON'T make a significant change:</h3>
+                        <div class="options">
+                            <div class="option">
+                                <input type="radio" id="q14a" name="q14" value="5">
+                                <label for="q14a">I feel genuinely disappointed and regretful</label>
+                            </div>
+                            <div class="option">
+                                <input type="radio" id="q14b" name="q14" value="4">
+                                <label for="q14b">I feel like I missed an important opportunity</label>
+                            </div>
+                            <div class="option">
+                                <input type="radio" id="q14c" name="q14" value="3">
+                                <label for="q14c">I feel somewhat disappointed but probably okay</label>
+                            </div>
+                            <div class="option">
+                                <input type="radio" id="q14d" name="q14" value="2">
+                                <label for="q14d">I feel fine - there are other paths to fulfillment</label>
+                            </div>
+                            <div class="option">
+                                <input type="radio" id="q14e" name="q14" value="1">
+                                <label for="q14e">I feel relieved to have maintained stability</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="question">
+                        <h3>Question 15: My expertise could solve significant systemic challenges:</h3>
+                        <div class="options">
+                            <div class="option">
+                                <input type="radio" id="q15a" name="q15" value="5">
+                                <label for="q15a">I have specific ideas and am ready to develop them</label>
+                            </div>
+                            <div class="option">
+                                <input type="radio" id="q15b" name="q15" value="4">
+                                <label for="q15b">I see clear connections and want to explore them</label>
+                            </div>
+                            <div class="option">
+                                <input type="radio" id="q15c" name="q15" value="3">
+                                <label for="q15c">I believe this is true but need help seeing the applications</label>
+                            </div>
+                            <div class="option">
+                                <input type="radio" id="q15d" name="q15" value="2">
+                                <label for="q15d">This sounds appealing but I'm not sure how to start</label>
+                            </div>
+                            <div class="option">
+                                <input type="radio" id="q15e" name="q15" value="1">
+                                <label for="q15e">I hope this is true but have doubts about my relevance</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Email Collection Section -->
+                <div class="email-section">
+                    <h3>Get Your Assessment Results</h3>
+                    <p style="text-align: center; margin-bottom: 25px; color: #666;">Enter your email to receive your detailed readiness report and recommendations.</p>
+                    
+                    <div class="form-group">
+                        <label for="email">Email Address *</label>
+                        <input type="email" id="email" name="email" required>
+                    </div>
+
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="newsletter" name="newsletter" required>
+                        <label for="newsletter">I consent to receive the assessment results and occasional insights about meaningful career transitions via email. You can unsubscribe at any time.</label>
+                    </div>
+                </div>
+
+                <button type="submit" class="submit-btn" id="submitBtn" disabled>Get My Bridge Builder Assessment Results</button>
+            </form>
+
+            <div class="results" id="results">
+                <div class="score-display" id="scoreDisplay"></div>
+                <div class="category" id="categoryDisplay"></div>
+                <div class="description" id="categoryDescription"></div>
+                <div class="thank-you">
+                    <strong>Thank you!</strong> Your detailed assessment report will be sent to your email address shortly.
+                </div>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p>© 2025 Aries Yeo. All rights reserved.</p>
+        </div>
+    </div>
+
+    <script>
+        const form = document.getElementById('assessmentForm');
+        const submitBtn = document.getElementById('submitBtn');
+        const results = document.getElementById('results');
+        const scoreDisplay = document.getElementById('scoreDisplay');
+        const categoryDisplay = document.getElementById('categoryDisplay');
+        const categoryDescription = document.getElementById('categoryDescription');
+        const progressFill = document.getElementById('progressFill');
+
+        // Check if all questions are answered and email provided
+        function checkCompletion() {
+            const questions = 15;
+            const answered = [];
+            
+            for (let i = 1; i <= questions; i++) {
+                const questionAnswered = document.querySelector(`input[name="q${i}"]:checked`);
+                if (questionAnswered) {
+                    answered.push(i);
+                }
+            }
+            
+            const emailFilled = document.getElementById('email').value.trim() !== '';
+            const consentGiven = document.getElementById('newsletter').checked;
+            
+            const progress = (answered.length / questions) * 100;
+            progressFill.style.width = progress + '%';
+            
+            if (answered.length === questions && emailFilled && consentGiven) {
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Get My Bridge Builder Assessment Results';
+            } else {
+                submitBtn.disabled = true;
+                let missing = [];
+                if (answered.length < questions) missing.push(`${questions - answered.length} questions`);
+                if (!emailFilled) missing.push('email');
+                if (!consentGiven) missing.push('consent');
+                
+                submitBtn.textContent = `Complete Assessment (Missing: ${missing.join(', ')})`;
+            }
+        }
+
+        // Add visual feedback for selected options
+        document.addEventListener('change', function(e) {
+            if (e.target.type === 'radio') {
+                // Remove selected class from all options in this question
+                const questionName = e.target.name;
+                const allOptions = document.querySelectorAll(`input[name="${questionName}"]`);
+                allOptions.forEach(option => {
+                    option.closest('.option').classList.remove('selected');
+                });
+                
+                // Add selected class to chosen option
+                e.target.closest('.option').classList.add('selected');
+                
+                checkCompletion();
+            }
+        });
+
+        // Add event listeners for email and checkbox
+        document.getElementById('email').addEventListener('input', checkCompletion);
+        document.getElementById('newsletter').addEventListener('change', checkCompletion);
+
+        // Handle form submission
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            let totalScore = 0;
+            const email = document.getElementById('email').value;
+            
+            // Calculate total score
+            for (let i = 1; i <= 15; i++) {
+                const selectedOption = document.querySelector(`input[name="q${i}"]:checked`);
+                if (selectedOption) {
+                    totalScore += parseInt(selectedOption.value);
+                }
+            }
+            
+            // Determine category based on score
+            let category, categoryClass, description;
+            
+            if (totalScore >= 65 && totalScore <= 75) {
+                category = "Bridge Ready";
+                categoryClass = "bridge-ready";
+                description = "You're prepared for immediate strategic action. Your combination of vision, commitment, and realism positions you for successful transition.";
+            } else if (totalScore >= 50 && totalScore <= 64) {
+                category = "Foundation Strong";
+                categoryClass = "foundation-strong";
+                description = "You have solid readiness indicators but need strategic planning to address specific gaps before launching your transition.";
+            } else if (totalScore >= 35 && totalScore <= 49) {
+                category = "Pathway Emerging";
+                categoryClass = "pathway-emerging";
+                description = "You're in early stages of readiness. Focus on developing clarity and building commitment before major moves.";
+            } else if (totalScore >= 20 && totalScore <= 34) {
+                category = "Signal Detected";
+                categoryClass = "signal-detected";
+                description = "You're sensing the call to significance but need foundation work before considering major transitions.";
+            } else {
+                category = "Awareness Building";
+                categoryClass = "awareness-building";
+                description = "Use this time for exploration and reflection. Consider this the beginning of your journey toward meaningful work.";
+            }
+            
+            // Submit to Email Octopus
+            submitToEmailOctopus(email, totalScore, category);
+            
+            // Display results
+            scoreDisplay.textContent = `${totalScore}/75`;
+            categoryDisplay.textContent = category;
+            categoryDisplay.className = `category ${categoryClass}`;
+            categoryDescription.textContent = description;
+            
+            // Hide form and show results
+            form.style.display = 'none';
+            results.classList.add('show');
+            
+            // Scroll to results
+            results.scrollIntoView({ behavior: 'smooth' });
+        });
+
+        // Email Octopus submission function
+        function submitToEmailOctopus(email, score, category) {
+            const listId = '8b9998dc-79d6-11f0-a8ab-07a991d7b423';
+            const apiKey = 'eo_b7e737a6c4927e0c3d31834b34ae6e56a5ef40b3ba2562fe044b7dc335fbac65';
+            
+            const data = {
+                api_key: apiKey,
+                email_address: email,
+                fields: {
+                    Score: score,
+                    Category: category,
+                    AssessmentDate: new Date().toISOString().split('T')[0]
+                },
+                tags: ['Bridge Builder Assessment']
+            };
+
+            fetch(`https://emailoctopus.com/api/1.6/lists/${listId}/contacts`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(data)
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log('Successfully added to Email Octopus:', data);
+            })
+            .catch((error) => {
+                console.error('Error adding to Email Octopus:', error);
+                // Fallback - you could send data to your own server here
+            });
+        }
+
+        // Initial check
+        checkCompletion();
+
+        // Check if SVG logo loaded properly, show fallback if not
+        setTimeout(function() {
+            const svgLogo = document.querySelector('.logo');
+            const textLogo = document.getElementById('textLogo');
+            
+            if (!svgLogo || svgLogo.getBoundingClientRect().height === 0) {
+                if (textLogo) {
+                    textLogo.style.display = 'block';
+                }
+            }
+        }, 1000);
+    </script>
+</body>
+</html>
