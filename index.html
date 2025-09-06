@@ -934,39 +934,68 @@
             results.scrollIntoView({ behavior: 'smooth' });
         });
 
-        // Email Octopus submission function
-        function submitToEmailOctopus(email, score, category) {
-            const listId = '8b9998dc-79d6-11f0-a8ab-07a991d7b423';
-            const apiKey = 'eo_b7e737a6c4927e0c3d31834b34ae6e56a5ef40b3ba2562fe044b7dc335fbac65';
-            
-            const data = {
-                api_key: apiKey,
-                email_address: email, }
-                fields: {
-                    Score: score,
-                    Category: category,
-                    AssessmentDate: new Date().toISOString().split('T')[0]
-                },
-                tags: {"Bridge Builder Assessment": true,}
-                status: "subscribed"
-                        });
 
-            fetch(`https://emailoctopus.com/api/1.6/lists/${listId}/contacts`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(data)
-            })
-            .then(response => response.json())
-            .then(data => {
-                console.log('Successfully added to Email Octopus:', data);
-            })
-            .catch((error) => {
-                console.error('Error adding to Email Octopus:', error);
+            // Email Octopus submission RR
+        const data = JSON.stringify({
+  "email_address": email,
+  "fields": {
+    Score: score,
+    Category: category,
+    AssessmentDate: new Date().toISOString().split('T')[0]
+  },
+  "tags": {"Bridge Builder Assessment": true,
+  },
+  "status": "subscribed"
+});
+
+const xhr = new XMLHttpRequest();
+xhr.withCredentials = true;
+
+xhr.addEventListener("readystatechange", function () {
+  if (this.readyState === this.DONE) {
+    console.log(this.responseText);
+  }
+});
+
+xhr.open("PUT", "https://api.emailoctopus.com/lists/8b9998dc-79d6-11f0-a8ab-07a991d7b423/contacts");
+xhr.setRequestHeader("Authorization", "Bearer eo_b7e737a6c4927e0c3d31834b34ae6e56a5ef40b3ba2562fe044b7dc335fbac65");
+xhr.setRequestHeader("content-type", "application/json");
+
+xhr.send(data);
+        
+        // Email Octopus submission function - Claude
+//        function submitToEmailOctopus(email, score, category) {
+//            const listId = '8b9998dc-79d6-11f0-a8ab-07a991d7b423';
+//            const apiKey = 'eo_b7e737a6c4927e0c3d31834b34ae6e56a5ef40b3ba2562fe044b7dc335fbac65';
+//            
+//            const data = {
+//                api_key: apiKey,
+//                email_address: email, }
+//                fields: {
+//                    Score: score,
+//                    Category: category,
+//                    AssessmentDate: new Date().toISOString().split('T')[0]
+//               },
+//                tags: {"Bridge Builder Assessment": true,}
+//                status: "subscribed"
+//                        });
+//
+//            fetch(`https://api.emailoctopus.com/lists/${listId}/contacts`, {
+//                method: 'PUT',
+//                headers: {
+//                    'Content-Type': 'application/json',
+//                },
+//                body: JSON.stringify(data)
+//            })
+//            .then(response => response.json())
+//            .then(data => {
+//                console.log('Successfully added to Email Octopus:', data);
+//            })
+//            .catch((error) => {
+//                console.error('Error adding to Email Octopus:', error);
                 // Fallback - you could send data to your own server here
-            });
-        }
+//            });
+//        }
 
         // Initial check
         checkCompletion();
