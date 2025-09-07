@@ -1,11 +1,11 @@
 // Netlify Function: submit-to-email-octopus.js
-// Simple PUT method for upsert behavior
+// Test without first_name/last_name fields
 
 exports.handler = async (event, context) => {
   const headers = {
     'Access-Control-Allow-Origin': '*',
     'Access-Control-Allow-Headers': 'Content-Type',
-    'Access-Control-Allow-Methods': 'PUT, OPTIONS'
+    'Access-Control-Allow-Methods': 'POST, OPTIONS'
   };
 
   if (event.httpMethod === 'OPTIONS') {
@@ -23,11 +23,11 @@ exports.handler = async (event, context) => {
   try {
     const { email_address, first_name, last_name, score, category, assessment_date } = JSON.parse(event.body);
 
-    if (!email_address || !first_name || !last_name) {
+    if (!email_address) {
       return {
         statusCode: 400,
         headers: headers,
-        body: JSON.stringify({ error: 'Email, first name, and last name are required' })
+        body: JSON.stringify({ error: 'Email address is required' })
       };
     }
 
@@ -42,22 +42,22 @@ exports.handler = async (event, context) => {
       };
     }
 
+    // Test with just email and custom fields (no names)
     const emailOctopusData = {
       api_key: API_KEY,
       email_address: email_address,
       status: "SUBSCRIBED",
-      first_name: first_name,
-      last_name: last_name,
       fields: {
+        FirstName: first_name,  // Try as custom field instead
+        LastName: last_name,    // Try as custom field instead
         Score: score.toString(),
         Category: category,
         AssessmentDate: assessment_date
       }
     };
 
-    console.log('Using PUT method for upsert to Email Octopus');
+    console.log('Testing with names as custom fields:', JSON.stringify(emailOctopusData, null, 2));
 
-    // Use PUT for upsert behavior
     const response = await fetch(`https://emailoctopus.com/api/1.6/lists/${LIST_ID}/contacts`, {
       method: 'PUT',
       headers: {
@@ -75,7 +75,7 @@ exports.handler = async (event, context) => {
         headers: headers,
         body: JSON.stringify({ 
           success: true, 
-          message: 'Successfully added/updated in Email Octopus via PUT',
+          message: 'Successfully added/updated with names as custom fields',
           email: email_address,
           name: `${first_name} ${last_name}`,
           score: score,
