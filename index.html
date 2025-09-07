@@ -835,7 +835,8 @@
     const categoryDescription = document.getElementById('categoryDescription');
     const progressFill = document.getElementById('progressFill');
 
-    // Check if all questions are answered and email provided
+   
+// Check if all questions are answered and all fields provided
 function checkCompletion() {
     const questions = 15;
     const answered = [];
@@ -871,32 +872,35 @@ function checkCompletion() {
     }
 }
 
-// Add event listeners for all form fields
-document.getElementById('email').addEventListener('input', checkCompletion);
-document.getElementById('firstName').addEventListener('input', checkCompletion);
-document.getElementById('lastName').addEventListener('input', checkCompletion);
-document.getElementById('newsletter').addEventListener('change', checkCompletion);
+// Add visual feedback for selected options
+document.addEventListener('change', function(e) {
+    if (e.target.type === 'radio') {
+        // Remove selected class from all options in this question
+        const questionName = e.target.name;
+        const allOptions = document.querySelectorAll(`input[name="${questionName}"]`);
+        allOptions.forEach(option => {
+            option.closest('.option').classList.remove('selected');
+        });
+        
+        // Add selected class to chosen option
+        e.target.closest('.option').classList.add('selected');
+        
+        checkCompletion();
+    }
+});
 
-    // Add visual feedback for selected options
-    document.addEventListener('change', function(e) {
-        if (e.target.type === 'radio') {
-            // Remove selected class from all options in this question
-            const questionName = e.target.name;
-            const allOptions = document.querySelectorAll(`input[name="${questionName}"]`);
-            allOptions.forEach(option => {
-                option.closest('.option').classList.remove('selected');
-            });
-            
-            // Add selected class to chosen option
-            e.target.closest('.option').classList.add('selected');
-            
-            checkCompletion();
-        }
-    });
-
-    // Add event listeners for email and checkbox
-   // document.getElementById('email').addEventListener('input', checkCompletion);
-    // document.getElementById('newsletter').addEventListener('change', checkCompletion);
+// Add event listeners for all form fields (wait for DOM to load)
+document.addEventListener('DOMContentLoaded', function() {
+    const emailField = document.getElementById('email');
+    const firstNameField = document.getElementById('firstName');
+    const lastNameField = document.getElementById('lastName');
+    const newsletterField = document.getElementById('newsletter');
+    
+    if (emailField) emailField.addEventListener('input', checkCompletion);
+    if (firstNameField) firstNameField.addEventListener('input', checkCompletion);
+    if (lastNameField) lastNameField.addEventListener('input', checkCompletion);
+    if (newsletterField) newsletterField.addEventListener('change', checkCompletion);
+});
 
     // Handle form submission
     form.addEventListener('submit', function(e) {
