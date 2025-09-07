@@ -816,142 +816,153 @@
     </div>
 
     <script>
-        const form = document.getElementById('assessmentForm');
-        const submitBtn = document.getElementById('submitBtn');
-        const results = document.getElementById('results');
-        const scoreDisplay = document.getElementById('scoreDisplay');
-        const categoryDisplay = document.getElementById('categoryDisplay');
-        const categoryDescription = document.getElementById('categoryDescription');
-        const progressFill = document.getElementById('progressFill');
+    const form = document.getElementById('assessmentForm');
+    const submitBtn = document.getElementById('submitBtn');
+    const results = document.getElementById('results');
+    const scoreDisplay = document.getElementById('scoreDisplay');
+    const categoryDisplay = document.getElementById('categoryDisplay');
+    const categoryDescription = document.getElementById('categoryDescription');
+    const progressFill = document.getElementById('progressFill');
 
-        // Check if all questions are answered and email provided
-        function checkCompletion() {
-            const questions = 15;
-            const answered = [];
-            
-            for (let i = 1; i <= questions; i++) {
-                const questionAnswered = document.querySelector(`input[name="q${i}"]:checked`);
-                if (questionAnswered) {
-                    answered.push(i);
-                }
-            }
-            
-            const emailFilled = document.getElementById('email').value.trim() !== '';
-            const consentGiven = document.getElementById('newsletter').checked;
-            
-            const progress = (answered.length / questions) * 100;
-            progressFill.style.width = progress + '%';
-            
-            if (answered.length === questions && emailFilled && consentGiven) {
-                submitBtn.disabled = false;
-                submitBtn.textContent = 'Get My Bridge Builder Assessment Results';
-            } else {
-                submitBtn.disabled = true;
-                let missing = [];
-                if (answered.length < questions) missing.push(`${questions - answered.length} questions`);
-                if (!emailFilled) missing.push('email');
-                if (!consentGiven) missing.push('consent');
-                
-                submitBtn.textContent = `Complete Assessment (Missing: ${missing.join(', ')})`;
+    // Check if all questions are answered and email provided
+    function checkCompletion() {
+        const questions = 15;
+        const answered = [];
+        
+        for (let i = 1; i <= questions; i++) {
+            const questionAnswered = document.querySelector(`input[name="q${i}"]:checked`);
+            if (questionAnswered) {
+                answered.push(i);
             }
         }
+        
+        const emailFilled = document.getElementById('email').value.trim() !== '';
+        const consentGiven = document.getElementById('newsletter').checked;
+        
+        const progress = (answered.length / questions) * 100;
+        progressFill.style.width = progress + '%';
+        
+        if (answered.length === questions && emailFilled && consentGiven) {
+            submitBtn.disabled = false;
+            submitBtn.textContent = 'Get My Bridge Builder Assessment Results';
+        } else {
+            submitBtn.disabled = true;
+            let missing = [];
+            if (answered.length < questions) missing.push(`${questions - answered.length} questions`);
+            if (!emailFilled) missing.push('email');
+            if (!consentGiven) missing.push('consent');
+            
+            submitBtn.textContent = `Complete Assessment (Missing: ${missing.join(', ')})`;
+        }
+    }
 
-        // Add visual feedback for selected options
-        document.addEventListener('change', function(e) {
-            if (e.target.type === 'radio') {
-                // Remove selected class from all options in this question
-                const questionName = e.target.name;
-                const allOptions = document.querySelectorAll(`input[name="${questionName}"]`);
-                allOptions.forEach(option => {
-                    option.closest('.option').classList.remove('selected');
-                });
-                
-                // Add selected class to chosen option
-                e.target.closest('.option').classList.add('selected');
-                
-                checkCompletion();
-            }
-        });
-
-        // Add event listeners for email and checkbox
-        document.getElementById('email').addEventListener('input', checkCompletion);
-        document.getElementById('newsletter').addEventListener('change', checkCompletion);
-
-        // Handle form submission
-        form.addEventListener('submit', function(e) {
-            e.preventDefault();
-            
-            let totalScore = 0;
-            const email = document.getElementById('email').value;
-            
-            // Calculate total score
-            for (let i = 1; i <= 15; i++) {
-                const selectedOption = document.querySelector(`input[name="q${i}"]:checked`);
-                if (selectedOption) {
-                    totalScore += parseInt(selectedOption.value);
-                }
-            }
-            
-            // Determine category based on score
-            let category, categoryClass, description;
-            
-            if (totalScore >= 65 && totalScore <= 75) {
-                category = "Bridge Ready";
-                categoryClass = "bridge-ready";
-                description = "You're prepared for immediate strategic action. Your combination of vision, commitment, and realism positions you for successful transition.";
-            } else if (totalScore >= 50 && totalScore <= 64) {
-                category = "Foundation Strong";
-                categoryClass = "foundation-strong";
-                description = "You have solid readiness indicators but need strategic planning to address specific gaps before launching your transition.";
-            } else if (totalScore >= 35 && totalScore <= 49) {
-                category = "Pathway Emerging";
-                categoryClass = "pathway-emerging";
-                description = "You're in early stages of readiness. Focus on developing clarity and building commitment before major moves.";
-            } else if (totalScore >= 20 && totalScore <= 34) {
-                category = "Signal Detected";
-                categoryClass = "signal-detected";
-                description = "You're sensing the call to significance but need foundation work before considering major transitions.";
-            } else {
-                category = "Awareness Building";
-                categoryClass = "awareness-building";
-                description = "Use this time for exploration and reflection. Consider this the beginning of your journey toward meaningful work.";
-            }
-            
-            // Populate hidden fields for Netlify
-            document.getElementById('hiddenScore').value = totalScore;
-            document.getElementById('hiddenCategory').value = category;
-            
-            // Submit form to Netlify (secure - no API keys exposed)
-            const formData = new FormData(form);
-            
-            fetch('/', {
-                method: 'POST',
-                headers: { "Content-Type": "application/x-www-form-urlencoded" },
-                body: new URLSearchParams(formData).toString()
-            })
-            .then(() => {
-                console.log('Form successfully submitted to Netlify');
-            })
-            .catch((error) => {
-                console.error('Error submitting form:', error);
+    // Add visual feedback for selected options
+    document.addEventListener('change', function(e) {
+        if (e.target.type === 'radio') {
+            // Remove selected class from all options in this question
+            const questionName = e.target.name;
+            const allOptions = document.querySelectorAll(`input[name="${questionName}"]`);
+            allOptions.forEach(option => {
+                option.closest('.option').classList.remove('selected');
             });
             
-            // Display results
-            scoreDisplay.textContent = `${totalScore}/75`;
-            categoryDisplay.textContent = category;
-            categoryDisplay.className = `category ${categoryClass}`;
-            categoryDescription.textContent = description;
+            // Add selected class to chosen option
+            e.target.closest('.option').classList.add('selected');
             
-            // Hide form and show results
-            form.style.display = 'none';
-            results.classList.add('show');
-            
-            // Scroll to results
-            results.scrollIntoView({ behavior: 'smooth' });
-        });
+            checkCompletion();
+        }
+    });
 
-        // Initial check
-        checkCompletion();
-    </script>
+    // Add event listeners for email and checkbox
+    document.getElementById('email').addEventListener('input', checkCompletion);
+    document.getElementById('newsletter').addEventListener('change', checkCompletion);
+
+    // Handle form submission
+    form.addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        let totalScore = 0;
+        const email = document.getElementById('email').value;
+        
+        // Calculate total score
+        for (let i = 1; i <= 15; i++) {
+            const selectedOption = document.querySelector(`input[name="q${i}"]:checked`);
+            if (selectedOption) {
+                totalScore += parseInt(selectedOption.value);
+            }
+        }
+        
+        // Determine category based on score
+        let category, categoryClass, description;
+        
+        if (totalScore >= 65 && totalScore <= 75) {
+            category = "Bridge Ready";
+            categoryClass = "bridge-ready";
+            description = "You're prepared for immediate strategic action. Your combination of vision, commitment, and realism positions you for successful transition.";
+        } else if (totalScore >= 50 && totalScore <= 64) {
+            category = "Foundation Strong";
+            categoryClass = "foundation-strong";
+            description = "You have solid readiness indicators but need strategic planning to address specific gaps before launching your transition.";
+        } else if (totalScore >= 35 && totalScore <= 49) {
+            category = "Pathway Emerging";
+            categoryClass = "pathway-emerging";
+            description = "You're in early stages of readiness. Focus on developing clarity and building commitment before major moves.";
+        } else if (totalScore >= 20 && totalScore <= 34) {
+            category = "Signal Detected";
+            categoryClass = "signal-detected";
+            description = "You're sensing the call to significance but need foundation work before considering major transitions.";
+        } else {
+            category = "Awareness Building";
+            categoryClass = "awareness-building";
+            description = "Use this time for exploration and reflection. Consider this the beginning of your journey toward meaningful work.";
+        }
+        
+        // Display results FIRST (before trying email submission)
+        scoreDisplay.textContent = `${totalScore}/75`;
+        categoryDisplay.textContent = category;
+        categoryDisplay.className = `category ${categoryClass}`;
+        categoryDescription.textContent = description;
+        
+        // Hide form and show results
+        form.style.display = 'none';
+        results.classList.add('show');
+        
+        // Scroll to results
+        results.scrollIntoView({ behavior: 'smooth' });
+        
+        // Submit to Email Octopus in background (non-blocking)
+        submitToEmailOctopus(email, totalScore, category);
+    });
+
+    // Secure Email Octopus submission via Netlify function (runs in background)
+    function submitToEmailOctopus(email, score, category) {
+        const data = {
+            email_address: email,
+            score: score,
+            category: category,
+            assessment_date: new Date().toISOString().split('T')[0]
+        };
+
+        // Call our secure Netlify function (no API keys exposed!)
+        fetch('/.netlify/functions/submit-to-email-octopus', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(data)
+        })
+        .then(response => response.json())
+        .then(data => {
+            console.log('Successfully added to Email Octopus:', data);
+        })
+        .catch((error) => {
+            console.error('Error adding to Email Octopus:', error);
+            // Results still show even if email submission fails
+        });
+    }
+
+    // Initial check
+    checkCompletion();
+</script>
 </body>
 </html>
