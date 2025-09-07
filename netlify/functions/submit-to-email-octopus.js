@@ -1,5 +1,5 @@
 // Netlify Function: submit-to-email-octopus.js
-// Using correct Bearer token authentication
+// Move first/last names to custom fields
 
 exports.handler = async (event, context) => {
   const headers = {
@@ -42,13 +42,13 @@ exports.handler = async (event, context) => {
       };
     }
 
-    // Request body WITHOUT api_key (using Bearer token instead)
+    // Move first/last names to custom fields
     const emailOctopusData = {
       email_address: email_address,
       status: "subscribed",
-      first_name: first_name,
-      last_name: last_name,
       fields: {
+        FirstName: first_name,    // As custom field
+        LastName: last_name,      // As custom field
         Score: score.toString(),
         Category: category,
         AssessmentDate: assessment_date
@@ -58,10 +58,8 @@ exports.handler = async (event, context) => {
       }
     };
 
-    console.log('Using Bearer token authentication');
-    console.log('Request data:', JSON.stringify(emailOctopusData, null, 2));
+    console.log('Using first/last names as custom fields');
 
-    // Correct API endpoint with Bearer authentication
     const response = await fetch(`https://api.emailoctopus.com/lists/${LIST_ID}/contacts`, {
       method: 'PUT',
       headers: {
