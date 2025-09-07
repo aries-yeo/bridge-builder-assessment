@@ -1,11 +1,11 @@
 // Netlify Function: submit-to-email-octopus.js
-// Enhanced version with names, custom fields, tags, and explicit subscription status
+// Simple PUT method for upsert behavior
 
 exports.handler = async (event, context) => {
   const headers = {
     'Access-Control-Allow-Origin': '*',
     'Access-Control-Allow-Headers': 'Content-Type',
-    'Access-Control-Allow-Methods': 'POST, OPTIONS'
+    'Access-Control-Allow-Methods': 'PUT, OPTIONS'
   };
 
   if (event.httpMethod === 'OPTIONS') {
@@ -42,24 +42,24 @@ exports.handler = async (event, context) => {
       };
     }
 
-   // Enhanced data WITHOUT tags (temporary test)
-const emailOctopusData = {
-  api_key: API_KEY,
-  email_address: email_address,
-  status: "SUBSCRIBED",
-  first_name: first_name,
-  last_name: last_name,
-  fields: {
-    Score: score.toString(),
-    Category: category,
-    AssessmentDate: assessment_date
-  }
-  // tags temporarily removed for testing
-};
-    console.log('Sending complete data with subscription status to Email Octopus:', JSON.stringify(emailOctopusData, null, 2));
+    const emailOctopusData = {
+      api_key: API_KEY,
+      email_address: email_address,
+      status: "SUBSCRIBED",
+      first_name: first_name,
+      last_name: last_name,
+      fields: {
+        Score: score.toString(),
+        Category: category,
+        AssessmentDate: assessment_date
+      }
+    };
 
+    console.log('Using PUT method for upsert to Email Octopus');
+
+    // Use PUT for upsert behavior
     const response = await fetch(`https://emailoctopus.com/api/1.6/lists/${LIST_ID}/contacts`, {
-      method: 'POST',
+      method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
       },
@@ -75,13 +75,11 @@ const emailOctopusData = {
         headers: headers,
         body: JSON.stringify({ 
           success: true, 
-          message: 'Successfully added/updated in Email Octopus',
+          message: 'Successfully added/updated in Email Octopus via PUT',
           email: email_address,
           name: `${first_name} ${last_name}`,
           score: score,
-          category: category,
-          status: 'SUBSCRIBED',
-          tag: 'BridgeBuilderSurvey applied'
+          category: category
         })
       };
     } else {
@@ -89,7 +87,7 @@ const emailOctopusData = {
         statusCode: 400,
         headers: headers,
         body: JSON.stringify({ 
-          error: 'Failed to add to Email Octopus', 
+          error: 'Failed to add/update in Email Octopus', 
           details: result 
         })
       };
