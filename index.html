@@ -835,72 +835,76 @@
     const categoryDescription = document.getElementById('categoryDescription');
     const progressFill = document.getElementById('progressFill');
 
-   
-// Check if all questions are answered and all fields provided
-function checkCompletion() {
-    const questions = 15;
-    const answered = [];
-    
-    for (let i = 1; i <= questions; i++) {
-        const questionAnswered = document.querySelector(`input[name="q${i}"]:checked`);
-        if (questionAnswered) {
-            answered.push(i);
+    // Check if all questions are answered and all fields provided
+    function checkCompletion() {
+        const questions = 15;
+        const answered = [];
+        
+        for (let i = 1; i <= questions; i++) {
+            const questionAnswered = document.querySelector(`input[name="q${i}"]:checked`);
+            if (questionAnswered) {
+                answered.push(i);
+            }
+        }
+        
+        const emailField = document.getElementById('email');
+        const firstNameField = document.getElementById('firstName');
+        const lastNameField = document.getElementById('lastName');
+        const newsletterField = document.getElementById('newsletter');
+        
+        const emailFilled = emailField ? emailField.value.trim() !== '' : false;
+        const firstNameFilled = firstNameField ? firstNameField.value.trim() !== '' : false;
+        const lastNameFilled = lastNameField ? lastNameField.value.trim() !== '' : false;
+        const consentGiven = newsletterField ? newsletterField.checked : false;
+        
+        const progress = (answered.length / questions) * 100;
+        progressFill.style.width = progress + '%';
+        
+        if (answered.length === questions && emailFilled && firstNameFilled && lastNameFilled && consentGiven) {
+            submitBtn.disabled = false;
+            submitBtn.textContent = 'Get My Bridge Builder Assessment Results';
+        } else {
+            submitBtn.disabled = true;
+            let missing = [];
+            if (answered.length < questions) missing.push(`${questions - answered.length} questions`);
+            if (!firstNameFilled) missing.push('first name');
+            if (!lastNameFilled) missing.push('last name');
+            if (!emailFilled) missing.push('email');
+            if (!consentGiven) missing.push('consent');
+            
+            submitBtn.textContent = `Complete Assessment (Missing: ${missing.join(', ')})`;
         }
     }
-    
-    const emailFilled = document.getElementById('email').value.trim() !== '';
-    const firstNameFilled = document.getElementById('firstName').value.trim() !== '';
-    const lastNameFilled = document.getElementById('lastName').value.trim() !== '';
-    const consentGiven = document.getElementById('newsletter').checked;
-    
-    const progress = (answered.length / questions) * 100;
-    progressFill.style.width = progress + '%';
-    
-    if (answered.length === questions && emailFilled && firstNameFilled && lastNameFilled && consentGiven) {
-        submitBtn.disabled = false;
-        submitBtn.textContent = 'Get My Bridge Builder Assessment Results';
-    } else {
-        submitBtn.disabled = true;
-        let missing = [];
-        if (answered.length < questions) missing.push(`${questions - answered.length} questions`);
-        if (!firstNameFilled) missing.push('first name');
-        if (!lastNameFilled) missing.push('last name');
-        if (!emailFilled) missing.push('email');
-        if (!consentGiven) missing.push('consent');
-        
-        submitBtn.textContent = `Complete Assessment (Missing: ${missing.join(', ')})`;
-    }
-}
 
-// Add visual feedback for selected options
-document.addEventListener('change', function(e) {
-    if (e.target.type === 'radio') {
-        // Remove selected class from all options in this question
-        const questionName = e.target.name;
-        const allOptions = document.querySelectorAll(`input[name="${questionName}"]`);
-        allOptions.forEach(option => {
-            option.closest('.option').classList.remove('selected');
-        });
-        
-        // Add selected class to chosen option
-        e.target.closest('.option').classList.add('selected');
-        
-        checkCompletion();
-    }
-});
+    // Add visual feedback for selected options
+    document.addEventListener('change', function(e) {
+        if (e.target.type === 'radio') {
+            // Remove selected class from all options in this question
+            const questionName = e.target.name;
+            const allOptions = document.querySelectorAll(`input[name="${questionName}"]`);
+            allOptions.forEach(option => {
+                option.closest('.option').classList.remove('selected');
+            });
+            
+            // Add selected class to chosen option
+            e.target.closest('.option').classList.add('selected');
+            
+            checkCompletion();
+        }
+    });
 
-// Add event listeners for all form fields (wait for DOM to load)
-document.addEventListener('DOMContentLoaded', function() {
-    const emailField = document.getElementById('email');
-    const firstNameField = document.getElementById('firstName');
-    const lastNameField = document.getElementById('lastName');
-    const newsletterField = document.getElementById('newsletter');
-    
-    if (emailField) emailField.addEventListener('input', checkCompletion);
-    if (firstNameField) firstNameField.addEventListener('input', checkCompletion);
-    if (lastNameField) lastNameField.addEventListener('input', checkCompletion);
-    if (newsletterField) newsletterField.addEventListener('change', checkCompletion);
-});
+    // Add event listeners for form fields
+    function addEventListeners() {
+        const emailField = document.getElementById('email');
+        const firstNameField = document.getElementById('firstName');
+        const lastNameField = document.getElementById('lastName');
+        const newsletterField = document.getElementById('newsletter');
+        
+        if (emailField) emailField.addEventListener('input', checkCompletion);
+        if (firstNameField) firstNameField.addEventListener('input', checkCompletion);
+        if (lastNameField) lastNameField.addEventListener('input', checkCompletion);
+        if (newsletterField) newsletterField.addEventListener('change', checkCompletion);
+    }
 
     // Handle form submission
     form.addEventListener('submit', function(e) {
@@ -908,8 +912,8 @@ document.addEventListener('DOMContentLoaded', function() {
         
         let totalScore = 0;
         const email = document.getElementById('email').value;
-const firstName = document.getElementById('firstName').value;
-const lastName = document.getElementById('lastName').value;
+        const firstName = document.getElementById('firstName').value;
+        const lastName = document.getElementById('lastName').value;
         
         // Calculate total score
         for (let i = 1; i <= 15; i++) {
@@ -958,13 +962,15 @@ const lastName = document.getElementById('lastName').value;
         results.scrollIntoView({ behavior: 'smooth' });
         
         // Submit to Email Octopus in background (non-blocking)
-        submitToEmailOctopus(email, totalScore, category);
+        submitToEmailOctopus(email, firstName, lastName, totalScore, category);
     });
 
     // Secure Email Octopus submission via Netlify function (runs in background)
-    function submitToEmailOctopus(email, firstName, lastName, totalScore, category); {
+    function submitToEmailOctopus(email, firstName, lastName, score, category) {
         const data = {
-            email_address: email, 
+            email_address: email,
+            first_name: firstName,
+            last_name: lastName,
             score: score,
             category: category,
             assessment_date: new Date().toISOString().split('T')[0]
@@ -987,6 +993,12 @@ const lastName = document.getElementById('lastName').value;
             // Results still show even if email submission fails
         });
     }
+
+    // Initialize everything when page loads
+    document.addEventListener('DOMContentLoaded', function() {
+        addEventListeners();
+        checkCompletion();
+    });
 
     // Initial check
     checkCompletion();
