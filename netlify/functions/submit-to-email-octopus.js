@@ -42,23 +42,20 @@ exports.handler = async (event, context) => {
       };
     }
 
-    // Enhanced data with explicit subscription status
-    const emailOctopusData = {
-      api_key: API_KEY,
-      email_address: email_address,
-      status: "SUBSCRIBED",
-      first_name: first_name,
-      last_name: last_name,
-      fields: {
-        Score: score.toString(),
-        Category: category,
-        AssessmentDate: assessment_date
-      },
-      tags: {
-        BridgeBuilderSurvey: true
-      }
-    };
-
+   // Enhanced data WITHOUT tags (temporary test)
+const emailOctopusData = {
+  api_key: API_KEY,
+  email_address: email_address,
+  status: "SUBSCRIBED",
+  first_name: first_name,
+  last_name: last_name,
+  fields: {
+    Score: score.toString(),
+    Category: category,
+    AssessmentDate: assessment_date
+  }
+  // tags temporarily removed for testing
+};
     console.log('Sending complete data with subscription status to Email Octopus:', JSON.stringify(emailOctopusData, null, 2));
 
     const response = await fetch(`https://emailoctopus.com/api/1.6/lists/${LIST_ID}/contacts`, {
