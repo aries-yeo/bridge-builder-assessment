@@ -895,8 +895,8 @@ document.getElementById('newsletter').addEventListener('change', checkCompletion
     });
 
     // Add event listeners for email and checkbox
-    document.getElementById('email').addEventListener('input', checkCompletion);
-    document.getElementById('newsletter').addEventListener('change', checkCompletion);
+   // document.getElementById('email').addEventListener('input', checkCompletion);
+    // document.getElementById('newsletter').addEventListener('change', checkCompletion);
 
     // Handle form submission
     form.addEventListener('submit', function(e) {
@@ -904,6 +904,8 @@ document.getElementById('newsletter').addEventListener('change', checkCompletion
         
         let totalScore = 0;
         const email = document.getElementById('email').value;
+const firstName = document.getElementById('firstName').value;
+const lastName = document.getElementById('lastName').value;
         
         // Calculate total score
         for (let i = 1; i <= 15; i++) {
@@ -956,9 +958,9 @@ document.getElementById('newsletter').addEventListener('change', checkCompletion
     });
 
     // Secure Email Octopus submission via Netlify function (runs in background)
-    function submitToEmailOctopus(email, score, category) {
+    function submitToEmailOctopus(email, firstName, lastName, totalScore, category); {
         const data = {
-            email_address: email,
+            email_address: email, 
             score: score,
             category: category,
             assessment_date: new Date().toISOString().split('T')[0]
