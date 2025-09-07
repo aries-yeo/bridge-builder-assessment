@@ -1,5 +1,5 @@
 // Netlify Function: submit-to-email-octopus.js
-// Enhanced version with names, custom fields, and tags
+// Enhanced version with names, custom fields, tags, and explicit subscription status
 
 exports.handler = async (event, context) => {
   const headers = {
@@ -42,10 +42,11 @@ exports.handler = async (event, context) => {
       };
     }
 
-    // Enhanced data with names, custom fields, and tags
+    // Enhanced data with explicit subscription status
     const emailOctopusData = {
       api_key: API_KEY,
       email_address: email_address,
+      status: "SUBSCRIBED",
       first_name: first_name,
       last_name: last_name,
       fields: {
@@ -58,7 +59,7 @@ exports.handler = async (event, context) => {
       }
     };
 
-    console.log('Sending complete data to Email Octopus:', JSON.stringify(emailOctopusData, null, 2));
+    console.log('Sending complete data with subscription status to Email Octopus:', JSON.stringify(emailOctopusData, null, 2));
 
     const response = await fetch(`https://emailoctopus.com/api/1.6/lists/${LIST_ID}/contacts`, {
       method: 'POST',
@@ -77,11 +78,12 @@ exports.handler = async (event, context) => {
         headers: headers,
         body: JSON.stringify({ 
           success: true, 
-          message: 'Successfully added to Email Octopus with all data',
+          message: 'Successfully added/updated in Email Octopus',
           email: email_address,
           name: `${first_name} ${last_name}`,
           score: score,
           category: category,
+          status: 'SUBSCRIBED',
           tag: 'BridgeBuilderSurvey applied'
         })
       };
