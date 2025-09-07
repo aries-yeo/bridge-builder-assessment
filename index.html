@@ -835,7 +835,7 @@
     const categoryDescription = document.getElementById('categoryDescription');
     const progressFill = document.getElementById('progressFill');
 
-    // Check if all questions are answered and all fields provided
+    // Check if all questions are answered and handle signup/skip logic
     function checkCompletion() {
         const questions = 15;
         const answered = [];
@@ -847,30 +847,64 @@
             }
         }
         
+        const skipSignup = document.getElementById('skipSignup').checked;
         const emailField = document.getElementById('email');
         const firstNameField = document.getElementById('firstName');
         const lastNameField = document.getElementById('lastName');
         const newsletterField = document.getElementById('newsletter');
         
-        const emailFilled = emailField ? emailField.value.trim() !== '' : false;
-        const firstNameFilled = firstNameField ? firstNameField.value.trim() !== '' : false;
-        const lastNameFilled = lastNameField ? lastNameField.value.trim() !== '' : false;
-        const consentGiven = newsletterField ? newsletterField.checked : false;
+        // Toggle field requirements based on skip option
+        if (skipSignup) {
+            emailField.required = false;
+            firstNameField.required = false;
+            lastNameField.required = false;
+            newsletterField.required = false;
+            
+            // Visual feedback - dim the fields
+            document.getElementById('nameFields').style.opacity = '0.5';
+            document.getElementById('emailField').style.opacity = '0.5';
+            document.getElementById('newsletterConsent').style.opacity = '0.5';
+        } else {
+            emailField.required = true;
+            firstNameField.required = true;
+            lastNameField.required = true;
+            newsletterField.required = true;
+            
+            // Restore visibility
+            document.getElementById('nameFields').style.opacity = '1';
+            document.getElementById('emailField').style.opacity = '1';
+            document.getElementById('newsletterConsent').style.opacity = '1';
+        }
         
         const progress = (answered.length / questions) * 100;
         progressFill.style.width = progress + '%';
         
-        if (answered.length === questions && emailFilled && firstNameFilled && lastNameFilled && consentGiven) {
+        // Check completion based on skip option
+        let canSubmit = answered.length === questions;
+        
+        if (!skipSignup) {
+            const emailFilled = emailField.value.trim() !== '';
+            const firstNameFilled = firstNameField.value.trim() !== '';
+            const lastNameFilled = lastNameField.value.trim() !== '';
+            const consentGiven = newsletterField.checked;
+            
+            canSubmit = canSubmit && emailFilled && firstNameFilled && lastNameFilled && consentGiven;
+        }
+        
+        if (canSubmit) {
             submitBtn.disabled = false;
-            submitBtn.textContent = 'Get My Bridge Builder Assessment Results';
+            submitBtn.textContent = skipSignup ? 'Show My Assessment Results' : 'Get My Bridge Builder Assessment Results';
         } else {
             submitBtn.disabled = true;
             let missing = [];
             if (answered.length < questions) missing.push(`${questions - answered.length} questions`);
-            if (!firstNameFilled) missing.push('first name');
-            if (!lastNameFilled) missing.push('last name');
-            if (!emailFilled) missing.push('email');
-            if (!consentGiven) missing.push('consent');
+            
+            if (!skipSignup) {
+                if (!firstNameField.value.trim()) missing.push('first name');
+                if (!lastNameField.value.trim()) missing.push('last name');
+                if (!emailField.value.trim()) missing.push('email');
+                if (!newsletterField.checked) missing.push('consent');
+            }
             
             submitBtn.textContent = `Complete Assessment (Missing: ${missing.join(', ')})`;
         }
@@ -879,16 +913,13 @@
     // Add visual feedback for selected options
     document.addEventListener('change', function(e) {
         if (e.target.type === 'radio') {
-            // Remove selected class from all options in this question
             const questionName = e.target.name;
             const allOptions = document.querySelectorAll(`input[name="${questionName}"]`);
             allOptions.forEach(option => {
                 option.closest('.option').classList.remove('selected');
             });
             
-            // Add selected class to chosen option
             e.target.closest('.option').classList.add('selected');
-            
             checkCompletion();
         }
     });
@@ -899,11 +930,13 @@
         const firstNameField = document.getElementById('firstName');
         const lastNameField = document.getElementById('lastName');
         const newsletterField = document.getElementById('newsletter');
+        const skipField = document.getElementById('skipSignup');
         
         if (emailField) emailField.addEventListener('input', checkCompletion);
         if (firstNameField) firstNameField.addEventListener('input', checkCompletion);
         if (lastNameField) lastNameField.addEventListener('input', checkCompletion);
         if (newsletterField) newsletterField.addEventListener('change', checkCompletion);
+        if (skipField) skipField.addEventListener('change', checkCompletion);
     }
 
     // Handle form submission
@@ -911,9 +944,7 @@
         e.preventDefault();
         
         let totalScore = 0;
-        const email = document.getElementById('email').value;
-        const firstName = document.getElementById('firstName').value;
-        const lastName = document.getElementById('lastName').value;
+        const skipSignup = document.getElementById('skipSignup').checked;
         
         // Calculate total score
         for (let i = 1; i <= 15; i++) {
@@ -948,7 +979,7 @@
             description = "Use this time for exploration and reflection. Consider this the beginning of your journey toward meaningful work.";
         }
         
-        // Display results FIRST (before trying email submission)
+        // Display results
         scoreDisplay.textContent = `${totalScore}/75`;
         categoryDisplay.textContent = category;
         categoryDisplay.className = `category ${categoryClass}`;
@@ -961,8 +992,16 @@
         // Scroll to results
         results.scrollIntoView({ behavior: 'smooth' });
         
-        // Submit to Email Octopus in background (non-blocking)
-        submitToEmailOctopus(email, firstName, lastName, totalScore, category);
+        // Only submit to Email Octopus if they didn't skip signup
+        if (!skipSignup) {
+            const email = document.getElementById('email').value;
+            const firstName = document.getElementById('firstName').value;
+            const lastName = document.getElementById('lastName').value;
+            
+            submitToEmailOctopus(email, firstName, lastName, totalScore, category);
+        } else {
+            console.log('User chose to skip signup - no data submitted to Email Octopus');
+        }
     });
 
     // Secure Email Octopus submission via Netlify function (runs in background)
@@ -976,7 +1015,6 @@
             assessment_date: new Date().toISOString().split('T')[0]
         };
 
-        // Call our secure Netlify function (no API keys exposed!)
         fetch('/.netlify/functions/submit-to-email-octopus', {
             method: 'POST',
             headers: {
@@ -990,7 +1028,6 @@
         })
         .catch((error) => {
             console.error('Error adding to Email Octopus:', error);
-            // Results still show even if email submission fails
         });
     }
 
