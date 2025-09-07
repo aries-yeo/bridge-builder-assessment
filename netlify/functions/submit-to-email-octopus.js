@@ -1,26 +1,17 @@
 // Netlify Function: submit-to-email-octopus.js
-// Enhanced version with custom fields and tags
+// Test custom fields only
 
 exports.handler = async (event, context) => {
-  console.log('Function called with method:', event.httpMethod);
-
-  // Set CORS headers for all responses
   const headers = {
     'Access-Control-Allow-Origin': '*',
     'Access-Control-Allow-Headers': 'Content-Type',
     'Access-Control-Allow-Methods': 'POST, OPTIONS'
   };
 
-  // Handle preflight OPTIONS request
   if (event.httpMethod === 'OPTIONS') {
-    return {
-      statusCode: 200,
-      headers: headers,
-      body: ''
-    };
+    return { statusCode: 200, headers: headers, body: '' };
   }
 
-  // Only allow POST requests
   if (event.httpMethod !== 'POST') {
     return {
       statusCode: 405,
@@ -30,10 +21,8 @@ exports.handler = async (event, context) => {
   }
 
   try {
-    // Parse the request body
     const { email_address, score, category, assessment_date } = JSON.parse(event.body);
 
-    // Validate required fields
     if (!email_address) {
       return {
         statusCode: 400,
@@ -42,7 +31,6 @@ exports.handler = async (event, context) => {
       };
     }
 
-    // Get API credentials from environment variables
     const API_KEY = process.env.EMAIL_OCTOPUS_API_KEY;
     const LIST_ID = process.env.EMAIL_OCTOPUS_LIST_ID;
 
@@ -54,23 +42,19 @@ exports.handler = async (event, context) => {
       };
     }
 
-    // Enhanced data with custom fields and tags
+    // Test with custom fields only (no tags)
     const emailOctopusData = {
       api_key: API_KEY,
       email_address: email_address,
       fields: {
-        Score: score ? score.toString() : '',
-        Category: category || '',
-        AssessmentDate: assessment_date || ''
-      },
-      tags: {
-        BridgeBuilderSurvey: true
+        Score: score.toString(),
+        Category: category,
+        AssessmentDate: assessment_date
       }
     };
 
-    console.log('Sending enhanced data to Email Octopus:', JSON.stringify(emailOctopusData, null, 2));
+    console.log('Testing custom fields only:', JSON.stringify(emailOctopusData, null, 2));
 
-    // Call Email Octopus API
     const response = await fetch(`https://emailoctopus.com/api/1.6/lists/${LIST_ID}/contacts`, {
       method: 'POST',
       headers: {
@@ -88,15 +72,11 @@ exports.handler = async (event, context) => {
         headers: headers,
         body: JSON.stringify({ 
           success: true, 
-          message: 'Successfully added to Email Octopus with custom fields',
-          email: email_address,
-          score: score,
-          category: category,
-          tag: 'BridgeBuilderSurvey applied'
+          message: 'Successfully added with custom fields',
+          data: result
         })
       };
     } else {
-      console.error('Email Octopus API error:', result);
       return {
         statusCode: 400,
         headers: headers,
