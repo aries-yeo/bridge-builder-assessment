@@ -1,5 +1,5 @@
 // Netlify Function: submit-to-email-octopus.js
-// Test without first_name/last_name fields
+// Using correct API endpoint
 
 exports.handler = async (event, context) => {
   const headers = {
@@ -23,11 +23,11 @@ exports.handler = async (event, context) => {
   try {
     const { email_address, first_name, last_name, score, category, assessment_date } = JSON.parse(event.body);
 
-    if (!email_address) {
+    if (!email_address || !first_name || !last_name) {
       return {
         statusCode: 400,
         headers: headers,
-        body: JSON.stringify({ error: 'Email address is required' })
+        body: JSON.stringify({ error: 'Email, first name, and last name are required' })
       };
     }
 
@@ -42,23 +42,23 @@ exports.handler = async (event, context) => {
       };
     }
 
-    // Test with just email and custom fields (no names)
     const emailOctopusData = {
       api_key: API_KEY,
       email_address: email_address,
       status: "SUBSCRIBED",
+      first_name: first_name,
+      last_name: last_name,
       fields: {
-        FirstName: first_name,  // Try as custom field instead
-        LastName: last_name,    // Try as custom field instead
         Score: score.toString(),
         Category: category,
         AssessmentDate: assessment_date
       }
     };
 
-    console.log('Testing with names as custom fields:', JSON.stringify(emailOctopusData, null, 2));
+    console.log('Using correct API endpoint:', `https://api.emailoctopus.com/lists/${LIST_ID}/contacts`);
 
-    const response = await fetch(`https://emailoctopus.com/api/1.6/lists/${LIST_ID}/contacts`, {
+    // Correct API endpoint
+    const response = await fetch(`https://api.emailoctopus.com/lists/${LIST_ID}/contacts`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
@@ -75,7 +75,7 @@ exports.handler = async (event, context) => {
         headers: headers,
         body: JSON.stringify({ 
           success: true, 
-          message: 'Successfully added/updated with names as custom fields',
+          message: 'Successfully added/updated in Email Octopus',
           email: email_address,
           name: `${first_name} ${last_name}`,
           score: score,
