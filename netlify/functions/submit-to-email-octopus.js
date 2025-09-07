@@ -1,5 +1,5 @@
 // Netlify Function: submit-to-email-octopus.js
-// Test custom fields only
+// Enhanced version with names, custom fields, and tags
 
 exports.handler = async (event, context) => {
   const headers = {
@@ -21,13 +21,13 @@ exports.handler = async (event, context) => {
   }
 
   try {
-    const { email_address, score, category, assessment_date } = JSON.parse(event.body);
+    const { email_address, first_name, last_name, score, category, assessment_date } = JSON.parse(event.body);
 
-    if (!email_address) {
+    if (!email_address || !first_name || !last_name) {
       return {
         statusCode: 400,
         headers: headers,
-        body: JSON.stringify({ error: 'Email address is required' })
+        body: JSON.stringify({ error: 'Email, first name, and last name are required' })
       };
     }
 
@@ -42,18 +42,23 @@ exports.handler = async (event, context) => {
       };
     }
 
-    // Test with custom fields only (no tags)
+    // Enhanced data with names, custom fields, and tags
     const emailOctopusData = {
       api_key: API_KEY,
       email_address: email_address,
+      first_name: first_name,
+      last_name: last_name,
       fields: {
         Score: score.toString(),
         Category: category,
         AssessmentDate: assessment_date
+      },
+      tags: {
+        BridgeBuilderSurvey: true
       }
     };
 
-    console.log('Testing custom fields only:', JSON.stringify(emailOctopusData, null, 2));
+    console.log('Sending complete data to Email Octopus:', JSON.stringify(emailOctopusData, null, 2));
 
     const response = await fetch(`https://emailoctopus.com/api/1.6/lists/${LIST_ID}/contacts`, {
       method: 'POST',
@@ -72,8 +77,12 @@ exports.handler = async (event, context) => {
         headers: headers,
         body: JSON.stringify({ 
           success: true, 
-          message: 'Successfully added with custom fields',
-          data: result
+          message: 'Successfully added to Email Octopus with all data',
+          email: email_address,
+          name: `${first_name} ${last_name}`,
+          score: score,
+          category: category,
+          tag: 'BridgeBuilderSurvey applied'
         })
       };
     } else {
