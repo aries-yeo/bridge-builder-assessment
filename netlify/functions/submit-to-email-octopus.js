@@ -1,5 +1,5 @@
 // Netlify Function: submit-to-email-octopus.js
-// Simplified version - just adds email, then we'll add custom fields
+// Enhanced version with custom fields and tags
 
 exports.handler = async (event, context) => {
   console.log('Function called with method:', event.httpMethod);
@@ -54,13 +54,21 @@ exports.handler = async (event, context) => {
       };
     }
 
-    // Start with basic email subscription only
+    // Enhanced data with custom fields and tags
     const emailOctopusData = {
       api_key: API_KEY,
-      email_address: email_address
+      email_address: email_address,
+      fields: {
+        Score: score ? score.toString() : '',
+        Category: category || '',
+        AssessmentDate: assessment_date || ''
+      },
+      tags: {
+        BridgeBuilderSurvey: true
+      }
     };
 
-    console.log('Sending basic subscription to Email Octopus');
+    console.log('Sending enhanced data to Email Octopus:', JSON.stringify(emailOctopusData, null, 2));
 
     // Call Email Octopus API
     const response = await fetch(`https://emailoctopus.com/api/1.6/lists/${LIST_ID}/contacts`, {
@@ -80,10 +88,11 @@ exports.handler = async (event, context) => {
         headers: headers,
         body: JSON.stringify({ 
           success: true, 
-          message: 'Successfully added to Email Octopus',
+          message: 'Successfully added to Email Octopus with custom fields',
           email: email_address,
           score: score,
-          category: category
+          category: category,
+          tag: 'BridgeBuilderSurvey applied'
         })
       };
     } else {
