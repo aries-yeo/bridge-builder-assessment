@@ -1,5 +1,5 @@
 // Netlify Function: submit-to-email-octopus.js
-// Using correct API endpoint
+// Using correct Bearer token authentication
 
 exports.handler = async (event, context) => {
   const headers = {
@@ -42,8 +42,8 @@ exports.handler = async (event, context) => {
       };
     }
 
+    // Request body WITHOUT api_key (using Bearer token instead)
     const emailOctopusData = {
-      api_key: API_KEY,
       email_address: email_address,
       status: "SUBSCRIBED",
       first_name: first_name,
@@ -52,16 +52,21 @@ exports.handler = async (event, context) => {
         Score: score.toString(),
         Category: category,
         AssessmentDate: assessment_date
+      },
+      tags: {
+        BridgeBuilderSurvey: true
       }
     };
 
-    console.log('Using correct API endpoint:', `https://api.emailoctopus.com/lists/${LIST_ID}/contacts`);
+    console.log('Using Bearer token authentication');
+    console.log('Request data:', JSON.stringify(emailOctopusData, null, 2));
 
-    // Correct API endpoint
+    // Correct API endpoint with Bearer authentication
     const response = await fetch(`https://api.emailoctopus.com/lists/${LIST_ID}/contacts`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
+        'Authorization': `Bearer ${API_KEY}`
       },
       body: JSON.stringify(emailOctopusData)
     });
@@ -79,7 +84,8 @@ exports.handler = async (event, context) => {
           email: email_address,
           name: `${first_name} ${last_name}`,
           score: score,
-          category: category
+          category: category,
+          tag: 'BridgeBuilderSurvey applied'
         })
       };
     } else {
