@@ -338,7 +338,11 @@
             margin-bottom: 25px;
             overflow: hidden;
         }
-
+.skip-message a:hover {
+    color: #307066;
+    border-bottom-color: #307066;
+    transition: all 0.3s ease;
+}
         .progress-fill {
             height: 100%;
             background: linear-gradient(90deg, #64bcae, #307066);
@@ -819,13 +823,22 @@
             </form>
 
             <div class="results" id="results">
-                <div class="score-display" id="scoreDisplay"></div>
-                <div class="category" id="categoryDisplay"></div>
-                <div class="description" id="categoryDescription"></div>
-                <div class="thank-you">
-                    <strong>Thank you!</strong> Your detailed assessment report will be sent to your email address shortly.
-                </div>
-            </div>
+    <div class="score-display" id="scoreDisplay"></div>
+    <div class="category" id="categoryDisplay"></div>
+    <div class="description" id="categoryDescription"></div>
+    
+    <!-- Thank you message for newsletter signups -->
+    <div class="thank-you" id="emailThankYou" style="display: none;">
+        <strong>Thank you!</strong> Your detailed assessment report will be sent to your email address shortly.
+    </div>
+    
+    <!-- Alternative message for skip users -->
+<div class="skip-message" id="skipMessage" style="display: none;">
+    <p style="text-align: center; margin-top: 20px; padding: 20px; background: #f8f9fa; border-radius: 10px; color: #307066;">
+        <strong>Want deeper insights?</strong> Consider <a href="https://www.ariesyeo.com/insights" target="_blank" style="color: #64bcae; text-decoration: none; font-weight: bold; border-bottom: 2px solid #64bcae;">subscribing</a> to receive additional resources and strategies for your transition journey.
+    </p>
+</div>
+</div>
         </div>
 
         <div class="footer">
@@ -947,69 +960,82 @@
     }
 
     // Handle form submission
-    form.addEventListener('submit', function(e) {
-        e.preventDefault();
-        
-        let totalScore = 0;
-        const skipSignup = document.getElementById('skipSignup').checked;
-        
-        // Calculate total score
-        for (let i = 1; i <= 15; i++) {
-            const selectedOption = document.querySelector(`input[name="q${i}"]:checked`);
-            if (selectedOption) {
-                totalScore += parseInt(selectedOption.value);
-            }
+    // Handle form submission
+form.addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    let totalScore = 0;
+    const skipSignup = document.getElementById('skipSignup').checked;
+    
+    // Calculate total score
+    for (let i = 1; i <= 15; i++) {
+        const selectedOption = document.querySelector(`input[name="q${i}"]:checked`);
+        if (selectedOption) {
+            totalScore += parseInt(selectedOption.value);
         }
+    }
+    
+    // Determine category based on score
+    let category, categoryClass, description;
+    
+    if (totalScore >= 65 && totalScore <= 75) {
+        category = "Bridge Ready";
+        categoryClass = "bridge-ready";
+        description = "You're prepared for immediate strategic action. Your combination of vision, commitment, and realism positions you for successful transition.";
+    } else if (totalScore >= 50 && totalScore <= 64) {
+        category = "Foundation Strong";
+        categoryClass = "foundation-strong";
+        description = "You have solid readiness indicators but need strategic planning to address specific gaps before launching your transition.";
+    } else if (totalScore >= 35 && totalScore <= 49) {
+        category = "Pathway Emerging";
+        categoryClass = "pathway-emerging";
+        description = "You're in early stages of readiness. Focus on developing clarity and building commitment before major moves.";
+    } else if (totalScore >= 20 && totalScore <= 34) {
+        category = "Signal Detected";
+        categoryClass = "signal-detected";
+        description = "You're sensing the call to significance but need foundation work before considering major transitions.";
+    } else {
+        category = "Awareness Building";
+        categoryClass = "awareness-building";
+        description = "Use this time for exploration and reflection. Consider this the beginning of your journey toward meaningful work.";
+    }
+    
+    // Display results
+    scoreDisplay.textContent = `${totalScore}/75`;
+    categoryDisplay.textContent = category;
+    categoryDisplay.className = `category ${categoryClass}`;
+    categoryDescription.textContent = description;
+    
+    // Show appropriate thank you message
+    const emailThankYou = document.getElementById('emailThankYou');
+    const skipMessage = document.getElementById('skipMessage');
+    
+    if (skipSignup) {
+        emailThankYou.style.display = 'none';
+        skipMessage.style.display = 'block';
+    } else {
+        emailThankYou.style.display = 'block';
+        skipMessage.style.display = 'none';
+    }
+    
+    // Hide form and show results
+    form.style.display = 'none';
+    results.classList.add('show');
+    
+    // Scroll to results
+    results.scrollIntoView({ behavior: 'smooth' });
+    
+    // Only submit to Email Octopus if they didn't skip signup
+    if (!skipSignup) {
+        const email = document.getElementById('email').value;
+        const firstName = document.getElementById('firstName').value;
+        const lastName = document.getElementById('lastName').value;
         
-        // Determine category based on score
-        let category, categoryClass, description;
-        
-        if (totalScore >= 65 && totalScore <= 75) {
-            category = "Bridge Ready";
-            categoryClass = "bridge-ready";
-            description = "You're prepared for immediate strategic action. Your combination of vision, commitment, and realism positions you for successful transition.";
-        } else if (totalScore >= 50 && totalScore <= 64) {
-            category = "Foundation Strong";
-            categoryClass = "foundation-strong";
-            description = "You have solid readiness indicators but need strategic planning to address specific gaps before launching your transition.";
-        } else if (totalScore >= 35 && totalScore <= 49) {
-            category = "Pathway Emerging";
-            categoryClass = "pathway-emerging";
-            description = "You're in early stages of readiness. Focus on developing clarity and building commitment before major moves.";
-        } else if (totalScore >= 20 && totalScore <= 34) {
-            category = "Signal Detected";
-            categoryClass = "signal-detected";
-            description = "You're sensing the call to significance but need foundation work before considering major transitions.";
-        } else {
-            category = "Awareness Building";
-            categoryClass = "awareness-building";
-            description = "Use this time for exploration and reflection. Consider this the beginning of your journey toward meaningful work.";
-        }
-        
-        // Display results
-        scoreDisplay.textContent = `${totalScore}/75`;
-        categoryDisplay.textContent = category;
-        categoryDisplay.className = `category ${categoryClass}`;
-        categoryDescription.textContent = description;
-        
-        // Hide form and show results
-        form.style.display = 'none';
-        results.classList.add('show');
-        
-        // Scroll to results
-        results.scrollIntoView({ behavior: 'smooth' });
-        
-        // Only submit to Email Octopus if they didn't skip signup
-        if (!skipSignup) {
-            const email = document.getElementById('email').value;
-            const firstName = document.getElementById('firstName').value;
-            const lastName = document.getElementById('lastName').value;
-            
-            submitToEmailOctopus(email, firstName, lastName, totalScore, category);
-        } else {
-            console.log('User chose to skip signup - no data submitted to Email Octopus');
-        }
-    });
+        submitToEmailOctopus(email, firstName, lastName, totalScore, category);
+    } else {
+        console.log('User chose to skip signup - no data submitted to Email Octopus');
+    }
+});
 
     // Secure Email Octopus submission via Netlify function (runs in background)
     function submitToEmailOctopus(email, firstName, lastName, score, category) {
