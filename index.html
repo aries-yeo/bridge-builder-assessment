@@ -836,36 +836,46 @@
     const progressFill = document.getElementById('progressFill');
 
     // Check if all questions are answered and email provided
-    function checkCompletion() {
-        const questions = 15;
-        const answered = [];
-        
-        for (let i = 1; i <= questions; i++) {
-            const questionAnswered = document.querySelector(`input[name="q${i}"]:checked`);
-            if (questionAnswered) {
-                answered.push(i);
-            }
-        }
-        
-        const emailFilled = document.getElementById('email').value.trim() !== '';
-        const consentGiven = document.getElementById('newsletter').checked;
-        
-        const progress = (answered.length / questions) * 100;
-        progressFill.style.width = progress + '%';
-        
-        if (answered.length === questions && emailFilled && consentGiven) {
-            submitBtn.disabled = false;
-            submitBtn.textContent = 'Get My Bridge Builder Assessment Results';
-        } else {
-            submitBtn.disabled = true;
-            let missing = [];
-            if (answered.length < questions) missing.push(`${questions - answered.length} questions`);
-            if (!emailFilled) missing.push('email');
-            if (!consentGiven) missing.push('consent');
-            
-            submitBtn.textContent = `Complete Assessment (Missing: ${missing.join(', ')})`;
+function checkCompletion() {
+    const questions = 15;
+    const answered = [];
+    
+    for (let i = 1; i <= questions; i++) {
+        const questionAnswered = document.querySelector(`input[name="q${i}"]:checked`);
+        if (questionAnswered) {
+            answered.push(i);
         }
     }
+    
+    const emailFilled = document.getElementById('email').value.trim() !== '';
+    const firstNameFilled = document.getElementById('firstName').value.trim() !== '';
+    const lastNameFilled = document.getElementById('lastName').value.trim() !== '';
+    const consentGiven = document.getElementById('newsletter').checked;
+    
+    const progress = (answered.length / questions) * 100;
+    progressFill.style.width = progress + '%';
+    
+    if (answered.length === questions && emailFilled && firstNameFilled && lastNameFilled && consentGiven) {
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Get My Bridge Builder Assessment Results';
+    } else {
+        submitBtn.disabled = true;
+        let missing = [];
+        if (answered.length < questions) missing.push(`${questions - answered.length} questions`);
+        if (!firstNameFilled) missing.push('first name');
+        if (!lastNameFilled) missing.push('last name');
+        if (!emailFilled) missing.push('email');
+        if (!consentGiven) missing.push('consent');
+        
+        submitBtn.textContent = `Complete Assessment (Missing: ${missing.join(', ')})`;
+    }
+}
+
+// Add event listeners for all form fields
+document.getElementById('email').addEventListener('input', checkCompletion);
+document.getElementById('firstName').addEventListener('input', checkCompletion);
+document.getElementById('lastName').addEventListener('input', checkCompletion);
+document.getElementById('newsletter').addEventListener('change', checkCompletion);
 
     // Add visual feedback for selected options
     document.addEventListener('change', function(e) {
