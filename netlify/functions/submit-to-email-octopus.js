@@ -45,7 +45,7 @@ exports.handler = async (event, context) => {
     // Request body WITHOUT api_key (using Bearer token instead)
     const emailOctopusData = {
       email_address: email_address,
-      status: "SUBSCRIBED",
+      status: "subscribed",
       first_name: first_name,
       last_name: last_name,
       fields: {
