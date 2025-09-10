@@ -49,7 +49,7 @@ exports.handler = async (event, context) => {
       fields: {
         FirstName: first_name,    // As custom field
         LastName: last_name,      // As custom field
-        Score: score.toString(),
+        Score: score,             //RR - changed from string to integer (was 'Score: score.toString(),')
         Category: category,
         AssessmentDate: assessment_date
       },
